@@ -124,10 +124,11 @@ class TSNEMetric(BaseMetric):
                 distances = cdist(emb1, emb2, metric='euclidean')
                 inter_distances.extend(distances.flatten())
         
+        # turn into float instead of type np.array
         return {
-            'avg_intra_cluster_distance': np.mean(intra_distances) if intra_distances else 0,
-            'avg_inter_cluster_distance': np.mean(inter_distances) if inter_distances else 0,
-            'separation_ratio': (np.mean(inter_distances) / np.mean(intra_distances)) if intra_distances and inter_distances else 0
+            'avg_intra_cluster_distance': float(np.mean(intra_distances)) if intra_distances else 0,
+            'avg_inter_cluster_distance': float(np.mean(inter_distances)) if inter_distances else 0,
+            'separation_ratio': (float(np.mean(inter_distances)) / float(np.mean(intra_distances))) if intra_distances and inter_distances else 0
         }
     
     def compute(self, real_path: Path, fake_path: Path, **kwargs) -> Dict[str, Any]:
@@ -195,7 +196,7 @@ class TSNEMetric(BaseMetric):
         # Apply t-SNE
         print(f"\n--- Applying t-SNE (perplexity={perplexity}, n_iter={n_iter}) ---")
         tsne = TSNE(n_components=2, perplexity=min(perplexity, len(embeddings)-1), 
-                    n_iter=n_iter, random_state=42, verbose=1)
+                    max_iter=n_iter, random_state=42, verbose=1)
         embeddings_2d = tsne.fit_transform(embeddings)
         
         # Calculate clustering metrics
