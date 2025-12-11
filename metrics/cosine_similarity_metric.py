@@ -75,14 +75,19 @@ class CosineSimilarityMetric(BaseMetric):
         
         # If no specific pairs provided, use images from fake_path
         if image_pairs is None:
+            real_images = self.get_image_paths(real_path)
             fake_images = self.get_image_paths(fake_path)
             print(f"\nFound {len(fake_images)} images in fake directory")
             
-            if len(fake_images) < 2:
+            if len(fake_images) < 2 or len(real_images) < 2:
                 raise ValueError("Need at least 2 images to compute similarity")
             
             # Create pairs: compare first image with all others
-            image_pairs = [(fake_images[0], img) for img in fake_images[1:]]
+            assert len(fake_images) == len(real_images), "Mismatch in number of fake and real images"
+            # sort both lists to ensure consistent pairing
+            fake_images.sort()
+            real_images.sort()
+            image_pairs = [(fake_images[i], real_images[i]) for i in range(len(fake_images))]
             print(f"Created {len(image_pairs)} pairs for comparison")
         
         similarities = []

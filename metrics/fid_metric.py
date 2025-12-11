@@ -145,6 +145,10 @@ class FIDMetric(BaseMetric):
                 f"Please provide at least 2 images for both real and fake sets."
             )
         
+        # sort image paths to ensure consistent ordering
+        real_images.sort()
+        fake_images.sort()
+        
         # Extract features using injected model
         print("\n--- Extracting features from REAL images ---")
         features_real = self._extract_features_batch(real_images)
