@@ -17,6 +17,7 @@ from metrics import FIDMetric, CosineSimilarityMetric, TSNEMetric, BaseMetric
 from models import InceptionModel, FaceNetModel
 
 INCEPTION_MODEL = InceptionModel(device='auto', image_size=1024)
+FACENET_MODEL = FaceNetModel(device='auto', use_facenet=True)
 
 class MetricEvaluator:
     """
@@ -83,15 +84,6 @@ class MetricEvaluator:
         # Save individual metric results
         output_file = self.output_dir / f"fid_results_{self.timestamp}.json"
         metric.save_results(output_file)
-        
-        return result
-        metric = FIDMetric(config)
-        result = metric.compute(self.real_path, self.fake_path)
-        
-        # Save individual metric results
-        output_file = self.output_dir / f"fid_results_{self.timestamp}.json"
-        metric.save_results(output_file)
-        
         return result
     
     def run_cosine_similarity(self, config: Dict[str, Any] = None, 
@@ -110,7 +102,7 @@ class MetricEvaluator:
         print("METRIC B: Cosine Similarity - Đánh giá tính nhất quán")
         print("="*80)
         
-        metric = CosineSimilarityMetric(model=self.facenet_model, config=config)
+        metric = CosineSimilarityMetric(model=INCEPTION_MODEL, config=config)
         result = metric.compute(self.real_path, self.fake_path, image_pairs=image_pairs)
         
         # Save individual metric results
@@ -133,7 +125,7 @@ class MetricEvaluator:
         print("METRIC C: t-SNE - Đánh giá khả năng phân tách")
         print("="*80)
         
-        metric = TSNEMetric(model=self.facenet_model, config=config)
+        metric = TSNEMetric(model=FACENET_MODEL, config=config)
         output_plot = self.output_dir / f"tsne_visualization_{self.timestamp}.png"
         result = metric.compute(self.real_path, self.fake_path, output_plot=str(output_plot))
         
@@ -231,7 +223,7 @@ class MetricEvaluator:
         if 'tsne' in metrics and 'error' not in metrics['tsne']:
             tsne = metrics['tsne']
             sep_ratio = tsne.get('cluster_metrics', {}).get('separation_ratio', 'N/A')
-            print(f"\n[Metric C] t-SNE Separation Ratio: {sep_ratio:.2f if isinstance(sep_ratio, float) else sep_ratio}")
+            print(f"\n[Metric C] t-SNE Separation Ratio: {str(sep_ratio) if isinstance(sep_ratio, float) else sep_ratio}")
             print(f"  {tsne.get('interpretation', 'N/A')}")
         
         print("\n" + "="*80)
