@@ -118,9 +118,4 @@ class FaceNetModel(BaseModel):
         
         # Convert to numpy
         embeddings = model_output.cpu().numpy()
-        
-        # Normalize embeddings (L2 normalization)
-        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-        embeddings = embeddings / (norms + 1e-8)  # Avoid division by zero
-        
         return embeddings
